@@ -8,6 +8,8 @@
 
 library(tidyverse)
 library(ggplot2)
+library(ggpubr)
+library(purrr)
 
 data("faithful")
 head(faithful)
@@ -26,7 +28,7 @@ r2 <- round(summary(eruption.lm)$r.squared, 3)
 
 #graph
 #point graph with a regression line
-ggplot(data = faithful, aes(x = waiting, y = eruptions)) +
+ggplot(data = faithful, aes(x = waiting, y = eruptions, colour = eruptions)) +
   geom_point() +
   annotate("text", x = 45, y = 5, label = paste0("slope == ", slope, "~(min/min)"), parse = TRUE, hjust = 0) +
   annotate("text", x = 45, y = 4.75, label = paste0("italic(p) < ", p.val), parse = TRUE, hjust = 0) +
@@ -36,7 +38,6 @@ ggplot(data = faithful, aes(x = waiting, y = eruptions)) +
        subtitle = "Linear regression",
        x = "Waiting time (minutes)",
        y = "Eruption duration (minutes)")
-
 
 # Chapter 9 - Correlations ------------------------------------------------
 
@@ -110,27 +111,36 @@ r_print <- paste0("r = ",
                   round(cor(x = ecklonia$stipe_length, ecklonia$frond_length),2))
 
 # Then create a single panel showing one correlation
-ggplot(data = ecklonia, aes(x = stipe_length, y = frond_length)) +
+eck_plot <- ecklonia %>% 
+  ggplot(aes(x = stipe_length, y = frond_length)) +
   geom_smooth(method = "lm", colour = "grey90", se = F) +
   geom_point(colour = "mediumorchid4") +
   geom_label(x = 300, y = 240, label = r_print) +
   labs(x = "Stipe length (cm)", y = "Frond length (cm)") +
   theme_pubclean()
+eck_plot
 
 # Multiple panel visual 
 corrplot(ecklonia_pearson, method = "circle")
 
 #basic heat map without explanation of colour correlation 
-heatmap(ecklonia_pearson, Colv = NA, Rowv = NA, scale="column")
+heat1 <- ecklonia_pearson %>% 
+  heatmap(Colv = NA, Rowv = NA, scale="column")
+heat1
 
 # Add classic arguments like main title and axis title
-heatmap(ecklonia_pearson, Colv = NA, Rowv = NA, scale="column", 
+heat2 <- ecklonia_pearson %>% 
+  heatmap(Colv = NA, Rowv = NA, scale="column", 
         xlab="", ylab="", main="Ecklonia_Pearson")
+heat2
 
 #pretty heat map with correlation bar
 library("pheatmap")
-pheatmap(ecklonia_pearson, cutree_rows = 9,
+
+heat3 <- ecklonia_pearson %>% 
+  pheatmap(cutree_rows = 9,
          xlab = "", ylab = "", main = "Ecklonia_pearson")
+heat3
 
 #figure title at the bottoms
 #tables = at top

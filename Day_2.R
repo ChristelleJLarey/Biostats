@@ -6,6 +6,7 @@
 library(tidyverse)
 library(plotly)
 library(ggpubr)
+library(ggplot2)
 
 #Normality
 # Random normal data
@@ -18,6 +19,7 @@ r_dat <- data.frame(dat = c(rnorm(n = 1000, mean = 10, sd = 3),
 h <- ggplot(data = r_dat, aes(x = dat, fill = sample)) +
   geom_histogram(position = "dodge", binwidth = 1, alpha = 0.8) +
   geom_density(aes(y = 1*..count.., fill = sample), colour = NA, alpha = 0.4) +
+  scale_fill_manual(values = c("lightseagreen", "plum")) +
   labs(x = "value")
 h
 
@@ -116,20 +118,31 @@ ecklonia_sub <- ecklonia %>%
   filter(variable == "stipe_mass")
 
 # then create a new figure
-ggplot(data = ecklonia_sub, aes(x = variable, y = value, fill = site)) +
+box_e <- ecklonia_sub %>% 
+  ggplot(aes(x = variable, y = value, fill = site)) +
   geom_boxplot() +
   coord_flip() +
   labs(y = "stipe mass (kg)", x = "") +
   theme(axis.text.y = element_blank(),
         axis.ticks.y = element_blank())
+box_e 
 
 #scatterplot
-ggplot(data = ecklonia_sub, aes(x = variable, y = value, colour = site)) +
+plot_sc <- ecklonia_sub %>% 
+  ggplot(aes(x = variable, y = value, colour = site)) +
   geom_point(size = 10, alpha = 0.4) +
   coord_flip() +
-  labs(y = "stipe mass (kg)", x = "") +
+  labs(main = "", y = "stipe mass (kg)", x = "") +
   theme(axis.text.y = element_blank(),
         axis.ticks.y = element_blank())
+plot_sc
+
+plot_sc + scale_colour_manual(values = c("firebrick1", "deeppink"))
+
+plot_sc + scale_color_brewer(palette="Dark2")
+
+#putting the plots together
+ggarrange(box_e, plot_sc,  ncol = 1, nrow = 2, labels = "AUTO")
 
 #Choosing tests
 
